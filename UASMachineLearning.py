@@ -19,10 +19,9 @@ class KNN():
         '''
         
         TrainingCSV = Pandas.read_csv( TrainingPath, names=CSV_COLUMN_NAMES).sample(frac=1).reset_index(drop=True)
-        
-        # Split the  training dataset into features and labels
+
         TrainingFS, self.TrainingLS = TrainingCSV, TrainingCSV.pop(ColoumnName)
-        # Normalize features
+
         self.norm_TrainingFS = (TrainingFS - TrainingFS.min()) / \
                                (TrainingFS.max() - TrainingFS.min())
 
@@ -35,10 +34,8 @@ class KNN():
             
         TestingCSV = Pandas.read_csv( TestingPath, names=CSV_COLUMN_NAMES).sample(frac=1).reset_index(drop=True)
             
-        # Split the  testing dataset into features and labels
         TestingFS, self.TestingLS = TestingCSV, TestingCSV.pop(ColoumnName)
             
-        # Normalize features
         self.norm_TestingFS = (TestingFS - TestingFS.min()) / \
             (TestingFS.max() - TestingFS.min())
 
@@ -49,15 +46,11 @@ class KNN():
         Prediction the label of each testing
         '''
         Distance = []
-        # Calculate the feature distances of given data points `TestPoint`
-        # from the testing dataset `TrainingFS`
+
         for f in self.norm_TrainingFS.values:
             Distance.append(sum(map(abs, f - TestPoint)))
         
-        # Binding feature distances with training labels
         _ = Pandas.DataFrame({"F": Distance, "L": self.TrainingLS})
-        # Sorting above dataframe by features distance from low to high
-        # Return the first k training labels
         _ = _.sort_values(by='F')['L'][0:self.k].values
 
         return _
@@ -65,15 +58,15 @@ class KNN():
 # Initialization
 TrainingAccuracy = []
 TestingAccuracy = []
-# K: from 1 to len(TrainingFS)
-for k in range(75):
+
+for k in range(35):
     knn = KNN(k=k + 1)
-    # Load data
+
     TrainingFS, TrainingLS = knn.TrainingData(TrainingPath)
     TestingFS, TestingLS = knn.TestingData(TestingPath)
 
 #Training Process
-    correct = 0  # Number of the correct Prediction from Training
+    correct = 0  
     for i, TestPoint in enumerate(TrainingFS.values, 0):
         _ = knn.Prediction(TestPoint)
         count = [list(_).count('Iris-setosa'),list(_).count('Iris-versicolor'), list(_).count('Iris-virginica')]
@@ -86,7 +79,7 @@ for k in range(75):
     TrainingAccuracy.append(correct / len(TrainingFS))
 
 #Testing Process
-    correct = 0  # Number of the correct Prediction from Testing
+    correct = 0  
     for i, TestPoint in enumerate(TestingFS.values, 0):
         _ = knn.Prediction(TestPoint)
         count = [list(_).count('Iris-setosa'),list(_).count('Iris-versicolor'), list(_).count('Iris-virginica')]
@@ -98,24 +91,24 @@ for k in range(75):
     
     TestingAccuracy.append(correct / len(TestingFS))
 
-#Grapich of Testing Accuracy with k = 1 to 75
+#Grapich of Training Accuracy with k = 1 to 35
 for (i, EachResult) in enumerate(TrainingAccuracy, 0):
     print('k: {}'.format(i + 1), 'Accuracy: {}'.format(EachResult))
 
 Pyplot.figure()
-Pyplot.plot(Numpy.arange(0, 75, 1), TrainingAccuracy, color='orange')
-Pyplot.plot(Numpy.arange(0, 75, 1), TestingAccuracy, color='g')
+Pyplot.plot(Numpy.arange(0, 35, 1), TrainingAccuracy, color='orange')
+Pyplot.plot(Numpy.arange(0, 35, 1), TestingAccuracy, color='g')
 Pyplot.legend(('Training Accuracy', 'Testing Accuracy'), loc=3)
 Pyplot.title('k - Accuracy')
 Pyplot.xlabel('Number of k')
 Pyplot.ylabel('Accuracy')
 Pyplot.show()
 
-#Grapich of Testing Accuracy with k = 1 to 75
+#Grapich of Testing Accuracy with k = 1 to 35
 for (i, EachResult) in enumerate(TestingAccuracy, 0):
     print('k: {}'.format(i + 1), 'Accuracy: {}'.format(EachResult))
 Pyplot.figure()
-Pyplot.plot(Numpy.arange(0, 75, 1), TestingAccuracy, color='g')
+Pyplot.plot(Numpy.arange(0, 35, 1), TestingAccuracy, color='g')
 Pyplot.title('k - Accuracy')
 Pyplot.xlabel('Number of k')
 Pyplot.ylabel('Accuracy')
